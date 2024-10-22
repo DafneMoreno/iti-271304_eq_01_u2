@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <!-- Cuadrícula de 25x25 -->
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:rowCount="25"
+        android:columnCount="25"
+        android:layout_alignParentTop="true"
+        android:layout_margin="16dp">
+
+        <!-- Las celdas se añadirán programáticamente -->
+
+    </GridLayout>
+
+    <!-- Botones para mover el robot -->
+    <LinearLayout
+        android:id="@+id/buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:gravity="bottom|end"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btn_move_forward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Move Forward" />
+
+        <Button
+            android:id="@+id/btn_turn_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Turn Left" />
+
+        <Button
+            android:id="@+id/btn_turn_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Turn Right" />
+
+        <Button
+            android:id="@+id/btn_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Play" />
+
+        <Button
+            android:id="@+id/btn_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Eliminar" />
+
+        <Button
+            android:id="@+id/btn_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Refrescar" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
