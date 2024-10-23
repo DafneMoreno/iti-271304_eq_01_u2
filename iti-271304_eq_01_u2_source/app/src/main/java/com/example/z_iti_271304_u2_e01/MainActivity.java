@@ -14,13 +14,13 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private GridLayout gridLayout;
-    private Button btnMoveForward, btnTurnLeft, btnTurnRight, btnPlay, btnDelete, btnRefresh;
+    private Button btnMoveForward, btnTurnLeft, btnTurnRight, btnDelete, btnRefresh;
     private ImageView robot;
 
     private List<String> instructions = new ArrayList<>();
     private int currentPositionX = 0;
     private int currentPositionY = 0;
-    private String direction = "UP";  // Puede ser "UP", "DOWN", "LEFT", "RIGHT"
+    private String direction = "UP";  // Direcciones posibles: "UP", "DOWN", "LEFT", "RIGHT"
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,66 +32,36 @@ public class MainActivity extends AppCompatActivity {
         btnMoveForward = findViewById(R.id.btn_move_forward);
         btnTurnLeft = findViewById(R.id.btn_turn_left);
         btnTurnRight = findViewById(R.id.btn_turn_right);
-        btnPlay = findViewById(R.id.btn_play);
         btnDelete = findViewById(R.id.btn_delete);
         btnRefresh = findViewById(R.id.btn_refresh);
 
-        // Inicializa la cuadrícula de 25x25 y el robot en la posición inicial
+        // Inicializa la cuadrícula de 10x10 y el robot en la posición inicial
         initializeGrid();
 
-        // Configura los botones para agregar instrucciones
+        // Botón para mover hacia adelante
         btnMoveForward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                instructions.add("MOVE_FORWARD");
-                Toast.makeText(MainActivity.this, "Instrucción: Mover Adelante", Toast.LENGTH_SHORT).show();
+                moveForward();
+                Toast.makeText(MainActivity.this, "Mover Adelante", Toast.LENGTH_SHORT).show();
             }
         });
 
+        // Botón para girar a la izquierda
         btnTurnLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                instructions.add("TURN_LEFT");
-                Toast.makeText(MainActivity.this, "Instrucción: Girar Izquierda", Toast.LENGTH_SHORT).show();
+                turnLeft();
+                Toast.makeText(MainActivity.this, "Girar Izquierda", Toast.LENGTH_SHORT).show();
             }
         });
 
+        // Botón para girar a la derecha
         btnTurnRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                instructions.add("TURN_RIGHT");
-                Toast.makeText(MainActivity.this, "Instrucción: Girar Derecha", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Botón de Play para ejecutar las instrucciones
-        btnPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                for (String instruction : instructions) {
-                    switch (instruction) {
-                        case "MOVE_FORWARD":
-                            moveForward();
-                            break;
-                        case "TURN_LEFT":
-                            turnLeft();
-                            break;
-                        case "TURN_RIGHT":
-                            turnRight();
-                            break;
-                    }
-                }
-            }
-        });
-
-        // Botón para eliminar la última instrucción
-        btnDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!instructions.isEmpty()) {
-                    instructions.remove(instructions.size() - 1);
-                    Toast.makeText(MainActivity.this, "Última instrucción eliminada", Toast.LENGTH_SHORT).show();
-                }
+                turnRight();
+                Toast.makeText(MainActivity.this, "Girar Derecha", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -99,60 +69,106 @@ public class MainActivity extends AppCompatActivity {
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                instructions.clear();
                 currentPositionX = 0;
                 currentPositionY = 0;
-                direction = "UP";
+                direction = "UP";  // Reiniciar la dirección a "arriba"
                 updateRobotPosition();
-                Toast.makeText(MainActivity.this, "Instrucciones reiniciadas", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Posición y dirección reiniciadas", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // Inicializa la cuadrícula de 25x25
+    // Inicializa la cuadrícula de 10x10
     private void initializeGrid() {
-        for (int i = 0; i < 25; i++) {
-            for (int j = 0; j < 25; j++) {
+        gridLayout.setColumnCount(10);  // Asegúrate de que el GridLayout tenga 10 columnas
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
                 ImageView cell = new ImageView(this);
-                cell.setBackgroundResource(R.drawable.cell_background);  // Definir en drawable
+                cell.setBackgroundResource(R.drawable.cell_border);  // Aplica el fondo con bordes
+
                 GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.width = 40;
-                params.height = 40;
+                params.width = 120;  // Tamaño de cada celda
+                params.height = 120;
                 cell.setLayoutParams(params);
                 gridLayout.addView(cell);
             }
         }
 
-        // Añadir el robot en la posición inicial (esquina superior izquierda)
+        // Inicializa el robot en la posición inicial (esquina superior izquierda)
         robot = new ImageView(this);
-        robot.setImageResource(R.drawable.robot_icon);  // Icono del robot
-        updateRobotPosition();
+        robot.setImageResource(R.drawable.robot_icon);  // Usa una imagen para el robot
+
+        // Ajusta el tamaño del robot
+        GridLayout.LayoutParams robotParams = new GridLayout.LayoutParams();
+        robotParams.width = 50;  // Tamaño del robot
+        robotParams.height = 50;
+        robot.setLayoutParams(robotParams);
+
+        updateRobotPosition();  // Coloca el robot en la posición inicial
     }
+
 
     // Mueve el robot a la posición correcta en la cuadrícula
     private void updateRobotPosition() {
-        gridLayout.removeView(robot);  // Remueve el robot de su posición anterior
-        int index = currentPositionY * 25 + currentPositionX;
-        gridLayout.addView(robot, index);
+        // Primero eliminamos el robot de su posición actual
+        gridLayout.removeView(robot);
+
+        // Calculamos el índice en la cuadrícula usando las coordenadas X e Y
+        int index = currentPositionY * 10 + currentPositionX;
+
+        // Asegúrate de que el índice esté dentro del rango correcto
+        if (index >= 0 && index < gridLayout.getChildCount()) {
+            // Ajusta el margen del robot para centrarlo en la celda
+            GridLayout.LayoutParams robotParams = new GridLayout.LayoutParams();
+            robotParams.width = 50;  // Tamaño del robot
+            robotParams.height = 50;
+            robotParams.setMargins(5, 5, 5, 5);  // Margen para centrar el robot
+            robot.setLayoutParams(robotParams);
+
+            // Añade el robot en la nueva posición
+            gridLayout.addView(robot, index);
+        } else {
+            Toast.makeText(this, "Índice fuera de rango", Toast.LENGTH_SHORT).show();  // Mensaje de error si algo está mal
+        }
     }
 
-    // Función para mover el robot adelante dependiendo de la dirección
+    // Función para mover el robot adelante en la dirección actual
     private void moveForward() {
         switch (direction) {
             case "UP":
-                if (currentPositionY > 0) currentPositionY--;
+                if (currentPositionY > 0) {
+                    currentPositionY--;
+                    updateRobotPosition();
+                } else {
+                    Toast.makeText(this, "No puedes salirte de la cuadrícula", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case "DOWN":
-                if (currentPositionY < 24) currentPositionY++;
+                if (currentPositionY < 9) {  // Cambiar a 9 para 10x10
+                    currentPositionY++;
+                    updateRobotPosition();
+                } else {
+                    Toast.makeText(this, "No puedes salirte de la cuadrícula", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case "LEFT":
-                if (currentPositionX > 0) currentPositionX--;
+                if (currentPositionX > 0) {
+                    currentPositionX--;
+                    updateRobotPosition();
+                } else {
+                    Toast.makeText(this, "No puedes salirte de la cuadrícula", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case "RIGHT":
-                if (currentPositionX < 24) currentPositionX++;
+                if (currentPositionX < 9) {  // Cambiar a 9 para 10x10
+                    currentPositionX++;
+                    updateRobotPosition();
+                } else {
+                    Toast.makeText(this, "No puedes salirte de la cuadrícula", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
-        updateRobotPosition();
     }
 
     // Función para girar a la izquierda
